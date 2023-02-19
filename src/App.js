@@ -1,52 +1,36 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
 //外部套件
 
-import logo from "./assets/logo.svg";
-import "./assets/App.css";
-import Input from "./components/Input";
-import "./assets/all.scss";
-//axios
+import "./assets/scss/all.scss";
+import Navbar from "./components/Navbar";
+import Products from "./components/Products";
+import Cart from "./components/Cart";
+import { CartContext, cartReducer, cartInit } from "./store";
+import { useReducer } from "react";
 
 function App() {
-  const [text, setText] = useState("");
-  const onChangeHandler = (e) => {
-    setText(e.target.value);
-  };
-
-  useEffect(() => {
-    (async () => {
-      const path = process.env.REACT_APP_PATH;
-      const result = await axios.get(path);
-      console.log(result);
-    })();
-  }, []);
+  const reducer = useReducer(cartReducer, cartInit);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>lorem ddddd</p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-        <button type="button" className="btn btn-primary">
-          Primary
-        </button>
-        {text}
-        <Input
-          id="sampleText"
-          text="這是一個input"
-          value={text}
-          onChangeHandler={onChangeHandler}
-        ></Input>
-      </header>
-    </div>
+    <CartContext.Provider value={reducer}>
+      <Navbar />
+      <div className="container mt-4">
+        <div className="row">
+          <div className="col-md-7">
+            {/*內層格線*/}
+            <Products />
+          </div>
+          <div className="col-md-5">
+            <Cart />
+          </div>
+        </div>
+      </div>
+    </CartContext.Provider>
   );
+}
+
+function calculateTotalPrice(cartList) {
+  return cartList
+    .map((item) => item.quanity * item.price)
+    .reduce((a, b) => a + b, 0);
 }
 
 export default App;
